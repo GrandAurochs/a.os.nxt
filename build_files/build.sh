@@ -30,3 +30,5 @@ dnf5 install -y \
 #### Example for enabling a System Unit File
 
 systemctl enable podman.socket
+systemctl set-default graphical.target
+systemctl enable lightdm.service
