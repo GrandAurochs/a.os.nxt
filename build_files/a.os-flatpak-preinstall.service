@@ -1,0 +1,16 @@
+[Unit]
+Description=a.os Native Flatpak Preinstallation Sync
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/var/lib/a.os-flatpaks-initialized
+
+[Service]
+Type=oneshot
+# The native sync trigger command
+ExecStart=/usr/bin/flatpak preinstall -y
+# Drop the marker so this never runs again on subsequent boots
+ExecStartPost=/usr/bin/touch /var/lib/a.os-flatpaks-initialized
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

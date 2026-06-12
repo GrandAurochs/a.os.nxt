@@ -34,6 +34,13 @@ git clone https://github.com/ohmyzsh/ohmyzsh.git /etc/skel/.oh-my-zsh
 cp /etc/skel/.oh-my-zsh/templates/zshrc.zsh-template /etc/skel/.zshrc
 sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="darkblood"/' /etc/skel/.zshrc
 
+mkdir -p /usr/share/flatpak/preinstall.d/
+mkdir -p /usr/lib/systemd/system/
+
+cp /tmp/build_files/apps.preinstall /usr/share/flatpak/preinstall.d/apps.preinstall
+cp /tmp/build_files/a.os-flatpak-preinstall.service /usr/lib/systemd/system/a.os-flatpak-preinstall.service
+systemctl enable a.os-flatpak-preinstall.service
+
 mkdir -p /usr/lib/tmpfiles.d
 
 
