@@ -37,9 +37,8 @@ sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="darkblood"/' /etc/skel/.zshrc
 mkdir -p /usr/share/flatpak/preinstall.d/
 mkdir -p /usr/lib/systemd/system/
 
-cp /build_files/apps.preinstall /usr/share/flatpak/preinstall.d/apps.preinstall
-cp /build_files/a.os-flatpak-preinstall.service /usr/lib/systemd/system/a.os-flatpak-preinstall.service
-systemctl enable a.os-flatpak-preinstall.service
+cp /ctx/build_files/apps.preinstall /usr/share/flatpak/preinstall.d/apps.preinstall
+cp /ctx/build_files/a.os-flatpak-preinstall.service /usr/lib/systemd/system/a.os-flatpak-preinstall.service
 
 mkdir -p /usr/lib/tmpfiles.d
 
@@ -57,3 +56,4 @@ EOF
 systemctl enable podman.socket
 systemctl set-default graphical.target
 systemctl enable lightdm.service
+systemctl enable a.os-flatpak-preinstall.service
