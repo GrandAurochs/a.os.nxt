@@ -18,7 +18,8 @@ dnf5 install -y \
     xfce4-terminal \
     NetworkManager-wifi \
     glibc-all-langpacks \
-    git
+    git \
+    zsh
 
 # Use a COPR Example:
 #
@@ -27,6 +28,11 @@ dnf5 install -y \
 # Disable COPRs so they don't end up enabled on the final image:
 # dnf5 -y copr disable ublue-os/staging
 
+sed -i 's/SHELL=.*/SHELL=/bin\/zsh/' /etc/default/useradd
+
+git clone https://github.com/ohmyzsh/ohmyzsh.git /etc/skel/.oh-my-zsh
+cp /etc/skel/.oh-my-zsh/templates/zshrc.zsh-template /etc/skel/.zshrc
+sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="darkblood"/' /etc/skel/.zshrc
 
 mkdir -p /usr/lib/tmpfiles.d
 
