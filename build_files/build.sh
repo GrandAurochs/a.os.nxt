@@ -46,8 +46,8 @@ cp /ctx/apps.preinstall /usr/share/flatpak/preinstall.d/apps.preinstall
 cp /ctx/a.os-flatpak-preinstall.service /usr/lib/systemd/system/a.os-flatpak-preinstall.service
 cp /ctx/a.os-flatpak-sync.sh /usr/libexec/a.os-flatpak-sync.sh
 chmod +x /usr/libexec/a.os-flatpak-sync.sh
-cp /ctx/aos-sync.sh /usr/bin/aos-sync.sh
-chmod +x /usr/bin/aos-sync.sh
+cp /ctx/aos-sync /usr/bin/aos-sync
+chmod +x /usr/bin/aos-sync
 
 mkdir -p /usr/lib/tmpfiles.d
 
