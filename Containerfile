@@ -3,7 +3,11 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM ghcr.io/ublue-os/base-main:latest
+ARG BASE_IMAGE="ghcr.io/ublue-os/base-main:latest"
+FROM ${BASE_IMAGE}
+
+ARG BASE_IMAGE
+ENV SYSTEM_BASE=${BASE_IMAGE}
 
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
@@ -34,7 +38,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh
-    
+
 ### LINTING
 ## Verify final image and contents are correct.
 RUN bootc container lint
