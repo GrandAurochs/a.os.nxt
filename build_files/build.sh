@@ -15,6 +15,7 @@ dnf5 install -y \
     plasma-desktop \
     sddm \
     plasma-workspace-wayland \
+    sddm-kcm \
     konsole \
     dolphin \
     NetworkManager-wifi \
@@ -50,6 +51,8 @@ chmod +x /usr/libexec/a.os-flatpak-sync.sh
 cp /ctx/aos-sync /usr/bin/aos-sync
 chmod +x /usr/bin/aos-sync
 
+mkdir -p /usr/lib/sddm/sddm.conf.d/
+cp /ctx/sddm-custom.conf /usr/lib/sddm/sddm.conf.d/sddm-custom.conf
 
 # Enable services
 
