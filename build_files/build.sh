@@ -11,11 +11,12 @@ set -ouex pipefail
 
 # this installs a package from fedora repos
 dnf5 install -y tmux 
-dnf5 group install -y xfce-desktop-environment
 dnf5 install -y \
-    lightdm \
-    lightdm-gtk-greeter \
-    xfce4-terminal \
+    plasma-desktop \
+    sddm \
+    plasma-workspace-wayland \
+    konsole \
+    dolphin \
     NetworkManager-wifi \
     glibc-all-langpacks \
     git \
@@ -49,20 +50,10 @@ chmod +x /usr/libexec/a.os-flatpak-sync.sh
 cp /ctx/aos-sync /usr/bin/aos-sync
 chmod +x /usr/bin/aos-sync
 
-mkdir -p /usr/lib/tmpfiles.d
-
-
-cat <<EOF > /usr/lib/tmpfiles.d/lightdm.conf
-# Type  Path                           Mode  UID      GID      Age  Argument
-d       /var/lib/lightdm               0750  lightdm  lightdm  -    -
-d       /var/lib/lightdm-data          0750  lightdm  lightdm  -    -
-d       /var/lib/lightdm-data/lightdm  0750  lightdm  lightdm  -    -
-d       /var/cache/lightdm             0750  lightdm  lightdm  -    -
-EOF
 
 # Enable services
 
 systemctl enable podman.socket
 systemctl set-default graphical.target
-systemctl enable lightdm.service
+systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service

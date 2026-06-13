@@ -6,3 +6,21 @@ Branch=stable
 
 [Flatpak Preinstall one.ablaze.floorp]
 Branch=stable
+
+[Flatpak Preinstall org.kde.gwenview]
+Branch=stable
+
+[Flatpak Preinstall org.kde.okular]
+Branch=stable
+
+[Flatpak Preinstall org.kde.spectacle]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kwrite]
+Branch=stable
+
+[Flatpak Preinstall org.kde.kalk]
+Branch=stable
+
+[Flatpak Preinstall io.github.DenysMb.Kontainer]
+Branch=stable
