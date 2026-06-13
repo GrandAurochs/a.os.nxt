@@ -36,9 +36,14 @@ sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="darkblood"/' /etc/skel/.zshrc
 
 mkdir -p /usr/share/flatpak/preinstall.d/
 mkdir -p /usr/lib/systemd/system/
+mkdir -p /usr/libexec/
 
 cp /ctx/apps.preinstall /usr/share/flatpak/preinstall.d/apps.preinstall
 cp /ctx/a.os-flatpak-preinstall.service /usr/lib/systemd/system/a.os-flatpak-preinstall.service
+cp /ctx/a.os-flatpak-sync.sh /usr/libexec/a.os-flatpak-sync.sh
+chmod +x /usr/libexec/a.os-flatpak-sync.sh
+cp /ctx/aos-sync /usr/bin/aos-sync
+chmod +x /usr/bin/aos-sync
 
 mkdir -p /usr/lib/tmpfiles.d
 
@@ -51,7 +56,7 @@ d       /var/lib/lightdm-data/lightdm  0750  lightdm  lightdm  -    -
 d       /var/cache/lightdm             0750  lightdm  lightdm  -    -
 EOF
 
-#### Example for enabling a System Unit File
+# Enable services
 
 systemctl enable podman.socket
 systemctl set-default graphical.target
