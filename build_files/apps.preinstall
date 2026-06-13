@@ -1,3 +1,8 @@
 [Flatpak Preinstall io.github.kolunmi.Bazaar]
 Branch=stable
 
+[Flatpak Preinstall org.gnome.TwentyFortyEight]
+Branch=stable
+
+[Flatpak Preinstall one.ablaze.floorp]
+Branch=stable

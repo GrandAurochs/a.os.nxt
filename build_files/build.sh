@@ -20,6 +20,10 @@ dnf5 install -y \
     glibc-all-langpacks \
     git \
     zsh
+dnf5 remove -y \
+    firefox \
+    firefox-langpacks \
+    fedora-bookmarks
 
 # Use a COPR Example:
 #
