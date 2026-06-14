@@ -24,3 +24,6 @@ Branch=stable
 
 [Flatpak Preinstall io.github.DenysMb.Kontainer]
 Branch=stable
+
+[Flatpak Preinstall org.fkoehler.KTailctl]
+Branch=stable

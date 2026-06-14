@@ -21,7 +21,8 @@ dnf5 install -y \
     NetworkManager-wifi \
     glibc-all-langpacks \
     git \
-    zsh
+    zsh \
+    tailscale
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
