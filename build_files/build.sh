@@ -16,9 +16,13 @@ dnf5 install -y \
     sddm \
     plasma-workspace-wayland \
     sddm-kcm \
+    kdeplasma-addons \
     konsole \
     dolphin \
     NetworkManager-wifi \
+    kscreen \
+    bluedevil \
+    print-manager \
     glibc-all-langpacks \
     git \
     zsh \
