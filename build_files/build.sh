@@ -19,11 +19,9 @@ dnf5 install -y \
     kdeplasma-addons \
     konsole \
     dolphin \
-    NetworkManager-wifi \
     kscreen \
     bluedevil \
-    print-manager \
-    glibc-all-langpacks \
+    kde-print-manager \
     git \
     zsh \
     tailscale \
