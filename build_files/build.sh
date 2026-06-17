@@ -26,7 +26,8 @@ dnf5 install -y \
     glibc-all-langpacks \
     git \
     zsh \
-    tailscale
+    tailscale \
+    plasma-nm
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
