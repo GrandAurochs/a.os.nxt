@@ -25,7 +25,11 @@ dnf5 install -y \
     git \
     zsh \
     tailscale \
-    plasma-nm
+    plasma-nm \
+    kinfocenter \
+    plasma-systemmonitor \
+    pam-kwallet \
+    kwalletmanager
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
