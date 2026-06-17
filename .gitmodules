@@ -1,0 +1,3 @@
+[submodule "build_files/common"]
+	path = build_files/common
+	url = https://github.com/GrandAurochs/common
