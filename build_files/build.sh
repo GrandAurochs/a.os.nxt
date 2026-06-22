@@ -29,7 +29,9 @@ dnf5 install -y \
     kinfocenter \
     plasma-systemmonitor \
     pam-kwallet \
-    kwalletmanager
+    kwalletmanager \
+    plasma-firewall \
+    plasma-firewall-firewalld
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
