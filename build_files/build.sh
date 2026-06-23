@@ -37,6 +37,8 @@ dnf5 remove -y \
     firefox-langpacks \
     fedora-bookmarks
 
+dnf5 reinstall -y firewalld
+
 # Use a COPR Example:
 #
 # dnf5 -y copr enable ublue-os/staging
