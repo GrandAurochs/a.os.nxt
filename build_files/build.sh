@@ -65,6 +65,8 @@ mkdir -p /usr/lib/sddm/sddm.conf.d/
 cp /ctx/sddm-custom.conf /usr/lib/sddm/sddm.conf.d/sddm-custom.conf
 
 cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
+rm /usr/share/wallpapers/Default
+mkdir /usr/share/wallpapers/Default
 ln -sf /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
 rm -r /usr/share/wallpapers/F44
 rm -r /usr/share/wallpapers/Fedora
