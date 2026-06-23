@@ -31,7 +31,11 @@ dnf5 install -y \
     pam-kwallet \
     kwalletmanager \
     plasma-firewall \
-    plasma-firewall-firewalld
+    plasma-firewall-firewalld \
+    kauth-devel
+    
+dnf5 install -y polkit-devel
+
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
