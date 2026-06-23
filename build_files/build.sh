@@ -64,7 +64,7 @@ chmod +x /usr/bin/aos-sync
 mkdir -p /usr/lib/sddm/sddm.conf.d/
 cp /ctx/sddm-custom.conf /usr/lib/sddm/sddm.conf.d/sddm-custom.conf
 
-cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
+cp -r /ctx/Fontainebleau /usr/share/wallpapers/Fontainebleau
 ln -sf Fontainebleau /usr/share/wallpapers/Default
 rm -r /usr/share/wallpapers/F44
 
