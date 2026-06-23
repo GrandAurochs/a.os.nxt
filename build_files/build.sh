@@ -77,3 +77,4 @@ systemctl enable podman.socket
 systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service
+systemctl enable firewalld.service
