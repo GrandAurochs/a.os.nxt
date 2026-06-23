@@ -32,9 +32,9 @@ dnf5 install -y \
     kwalletmanager \
     plasma-firewall \
     plasma-firewall-firewalld \
-    kauth-devel
+    kf6-kauth
     
-dnf5 install -y polkit-devel
+dnf5 install -y polkit-qt6-1
 
 dnf5 remove -y \
     firefox \
