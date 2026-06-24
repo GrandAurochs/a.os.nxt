@@ -31,7 +31,7 @@ dnf5 install -y \
     pam-kwallet \
     kwalletmanager \
     plasma-firewall \
-    plasma-firewall-firewalld \
+    plasma-firewall-ufw \
     kf6-kauth  \
     qt6-qtwayland \
     qt6-qtbase-devel
@@ -43,7 +43,8 @@ dnf5 remove -y \
     firefox-langpacks \
     fedora-bookmarks
 
-dnf5 reinstall -y firewalld
+dnf5 remove -y firewalld
+dnf install -y ufw
 
 # Use a COPR Example:
 #
@@ -89,4 +90,4 @@ systemctl enable podman.socket
 systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service
-systemctl enable firewalld.service
+systemctl enable ufw.service
