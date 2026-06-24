@@ -79,10 +79,6 @@ ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
 rm -r /usr/share/wallpapers/F44
 rm -r /usr/share/wallpapers/Fedora
 
-rm /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
-ln -sf /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.desktop.policy.choice /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
-
-ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/dbus-1/system-services/org.kde.kcm_firewall.service
 
 # Enable services
 
