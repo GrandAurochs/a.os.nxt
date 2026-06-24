@@ -32,7 +32,8 @@ dnf5 install -y \
     kwalletmanager \
     plasma-firewall \
     plasma-firewall-firewalld \
-    kf6-kauth
+    kf6-kauth \
+    kauth-helper
     
 dnf5 install -y polkit-qt6-1
 
