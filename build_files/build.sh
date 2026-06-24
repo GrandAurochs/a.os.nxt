@@ -31,7 +31,7 @@ dnf5 install -y \
     pam-kwallet \
     kwalletmanager \
     plasma-firewall \
-    plasma-firewall-ufw \
+    plasma-firewall-firewalld \
     kf6-kauth  \
     qt6-qtwayland \
     qt6-qtbase-devel
@@ -43,8 +43,7 @@ dnf5 remove -y \
     firefox-langpacks \
     fedora-bookmarks
 
-dnf5 remove -y firewalld
-dnf install -y ufw
+dnf5 reinstall -y firewalld
 
 # Use a COPR Example:
 #
@@ -79,6 +78,10 @@ ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
 rm -r /usr/share/wallpapers/F44
 rm -r /usr/share/wallpapers/Fedora
 
+rm /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
+ln -sf /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.desktop.policy.choice /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
+
+ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/dbus-1/system-services/org.kde.kcm_firewall.service
 
 # Enable services
 
@@ -86,4 +89,4 @@ systemctl enable podman.socket
 systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service
-systemctl enable ufw.service
+systemctl enable firewalld.service
