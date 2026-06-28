@@ -34,7 +34,12 @@ dnf5 install -y \
     plasma-firewall-firewalld \
     kf6-kauth  \
     qt6-qtwayland \
-    qt6-qtbase-devel
+    qt6-qtbase-devel \
+    gcc \
+    zstd \
+    bubblewrap
+
+dnf5 groupinstall -y development-tools
     
 dnf5 install -y polkit-qt6-1
 
@@ -52,12 +57,16 @@ dnf5 reinstall -y firewalld
 # Disable COPRs so they don't end up enabled on the final image:
 # dnf5 -y copr disable ublue-os/staging
 
-sed -i 's|SHELL=.*|SHELL=/bin/zsh|' /etc/default/useradd
 
-git clone https://github.com/ohmyzsh/ohmyzsh.git /etc/skel/.oh-my-zsh
-cp /etc/skel/.oh-my-zsh/templates/zshrc.zsh-template /etc/skel/.zshrc
-sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="darkblood"/' /etc/skel/.zshrc
+# OhMyZsh
+bash /ctx/omzsh.sh
 
+# Homebrew  non-root setup
+if [ -d /usr/share/homebrew ]; then
+    chown -R 1000:1000 /usr/share/homebrew
+fi
+
+# Flatpak
 mkdir -p /usr/share/flatpak/preinstall.d/
 mkdir -p /usr/lib/systemd/system/
 mkdir -p /usr/libexec/
@@ -69,20 +78,23 @@ chmod +x /usr/libexec/a.os-flatpak-sync.sh
 cp /ctx/aos-sync /usr/bin/aos-sync
 chmod +x /usr/bin/aos-sync
 
+# SDDM
 mkdir -p /usr/lib/sddm/sddm.conf.d/
 cp /ctx/sddm-custom.conf /usr/lib/sddm/sddm.conf.d/sddm-custom.conf
 
+# Wallpapers
 cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
 rm -r /usr/share/wallpapers/Default
 ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
 rm -r /usr/share/wallpapers/F44
 rm -r /usr/share/wallpapers/Fedora
 
+# Polkit Fixes
 rm /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
 ln -sf /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.desktop.policy.choice /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
-
 ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/dbus-1/system-services/org.kde.kcm_firewall.service
 
+# OS Release
 cp -f /ctx/os-release /usr/lib/os-release
 ln -sfn /usr/lib/os-release /etc/os-release
 
@@ -93,3 +105,6 @@ systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service
 systemctl enable firewalld.service
+systemctl enable brew-setup.service
+systemctl enable brew-update.timer
+systemctl enable brew-upgrade.timer
