@@ -1,0 +1,13 @@
+NAME="A.OS"
+VERSION="2.0"
+ID=aos
+ID_LIKE=fedora
+VERSION_CODENAME="Baton Rouge"
+VERSION_ID="1.0"
+PRETTY_NAME="A.OS)"
+ANSI_COLOR="0;38;5;147"
+LOGO="aos-logo"
+HOME_URL="https://github.com/GrandAurochs/a.os.nxt"
+DOCUMENTATION_URL="https://github.com/GrandAurochs/a.os.nxt"
+SUPPORT_URL="https://github.com/GrandAurochs/a.os.nxt"
+BUG_REPORT_URL="https://github.com/GrandAurochs/a.os.nxt"

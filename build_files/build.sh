@@ -83,6 +83,9 @@ ln -sf /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.desktop.policy.c
 
 ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/dbus-1/system-services/org.kde.kcm_firewall.service
 
+cp -f /ctx/os-release /usr/lib/os-release
+ln -sfn /usr/lib/os-release /etc/os-release
+
 # Enable services
 
 systemctl enable podman.socket
