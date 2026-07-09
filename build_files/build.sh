@@ -39,7 +39,7 @@ dnf5 install -y \
     zstd \
     bubblewrap
 
-dnf5 groupinstall -y development-tools
+dnf5 group install -y development-tools
     
 dnf5 install -y polkit-qt6-1
 
