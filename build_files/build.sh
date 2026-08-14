@@ -37,7 +37,8 @@ dnf5 install -y \
     qt6-qtbase-devel \
     gcc \
     zstd \
-    bubblewrap
+    bubblewrap \
+    spectacle
 
 dnf5 group install -y development-tools
     
