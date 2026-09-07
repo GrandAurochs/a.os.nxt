@@ -1,9 +1,10 @@
+# Base Image
+ARG BASE_IMAGE="ghcr.io/ublue-os/base-main:latest"
+
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
 COPY build_files /
 
-# Base Image
-ARG BASE_IMAGE="ghcr.io/ublue-os/base-main:latest"
 FROM ${BASE_IMAGE}
 
 ARG BASE_IMAGE
