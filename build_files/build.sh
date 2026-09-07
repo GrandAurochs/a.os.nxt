@@ -47,7 +47,15 @@ dnf5 install -y polkit-qt6-1
 dnf5 remove -y \
     firefox \
     firefox-langpacks \
-    fedora-bookmarks
+    fedora-bookmarks \
+    code
+
+rm -f /etc/yum.repos.d/vscode.repo
+
+# VSCodium
+cp /ctx/vscodium.repo /etc/yum.repos.d/vscodium.repo
+rpmkeys --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+dnf5 install -y codium
 
 dnf5 reinstall -y firewalld
 
