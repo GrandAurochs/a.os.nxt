@@ -38,7 +38,11 @@ dnf5 install -y \
     gcc \
     zstd \
     bubblewrap \
-    spectacle
+    spectacle \
+    cockpit \
+    cockpit-ws \
+    cockpit-podman \
+    cockpit-storaged
 
 dnf5 group install -y development-tools
     
@@ -119,6 +123,7 @@ ln -sfn /usr/lib/os-release /etc/os-release
 # Enable services
 
 systemctl enable podman.socket
+systemctl enable cockpit.socket
 systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service

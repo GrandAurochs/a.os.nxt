@@ -1,15 +1,16 @@
-Ini, TOML
-
 [Unit]
 Description=a.os Native Flatpak Preinstallation Sync
-After=network-online.target
+After=network.target network-online.target
 Wants=network-online.target
 
 [Service]
-Type=oneshot
+Type=exec
 # Run our evaluator script
 ExecStart=/usr/libexec/a.os-flatpak-sync.sh
+Restart=on-failure
+RestartSec=10s
 RemainAfterExit=yes
+TimeoutStartSec=infinity
 
 [Install]
 WantedBy=multi-user.target
