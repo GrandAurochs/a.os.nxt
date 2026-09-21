@@ -120,10 +120,24 @@ ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/
 cp -f /ctx/os-release /usr/lib/os-release
 ln -sfn /usr/lib/os-release /etc/os-release
 
+# Tailscale Multi-User Operator Configuration
+mkdir -p /usr/lib/systemd/system/user@.service.d/
+mkdir -p /etc/sudoers.d/
+mkdir -p /etc/profile.d/
+
+cp /ctx/tailscale-set-operator /usr/libexec/tailscale-set-operator
+chmod +x /usr/libexec/tailscale-set-operator
+cp /ctx/tailscale-operator.conf /usr/lib/systemd/system/user@.service.d/tailscale-operator.conf
+cp /ctx/tailscale-operator.sudoers /etc/sudoers.d/tailscale-operator
+chmod 0440 /etc/sudoers.d/tailscale-operator
+cp /ctx/tailscale-operator.sh /etc/profile.d/tailscale-operator.sh
+chmod +x /etc/profile.d/tailscale-operator.sh
+
 # Enable services
 
 systemctl enable podman.socket
 systemctl enable cockpit.socket
+systemctl enable tailscaled.service
 systemctl set-default graphical.target
 systemctl enable sddm.service
 systemctl enable a.os-flatpak-preinstall.service

@@ -1,0 +1,2 @@
+# Allow all users on this device to manage Tailscale and set operators without password
+ALL ALL=(root) NOPASSWD: /usr/bin/tailscale

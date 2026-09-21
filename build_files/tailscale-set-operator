@@ -1,0 +1,19 @@
+#!/bin/bash
+# Automatically set Tailscale operator to the logged-in user
+
+UID_NUM="${1:-}"
+if [ -z "$UID_NUM" ] || [ "$UID_NUM" -lt 1000 ]; then
+    exit 0
+fi
+
+USERNAME=$(id -nu "$UID_NUM" 2>/dev/null) || exit 0
+
+# Wait up to 10 seconds for tailscaled socket to be ready
+for i in {1..10}; do
+    if [ -S /run/tailscale/tailscaled.sock ] || [ -S /var/run/tailscale/tailscaled.sock ]; then
+        /usr/bin/tailscale set --operator="$USERNAME" 2>/dev/null && exit 0
+    fi
+    sleep 1
+done
+
+/usr/bin/tailscale set --operator="$USERNAME" 2>/dev/null || true
