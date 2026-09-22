@@ -13,12 +13,12 @@ set -ouex pipefail
 dnf5 install -y tmux 
 dnf5 install -y \
     plasma-desktop \
-    sddm \
+    plasma-login-manager \
     plasma-workspace-wayland \
     kde-gtk-config \
     xdg-desktop-portal-kde \
     xdg-desktop-portal-gtk \
-    sddm-kcm \
+    kcm-plasmalogin \
     kdeplasma-addons \
     konsole \
     dolphin \
@@ -103,9 +103,11 @@ chmod +x /usr/libexec/a.os-flatpak-sync.sh
 cp /ctx/aos-sync /usr/bin/aos-sync
 chmod +x /usr/bin/aos-sync
 
-# SDDM
-mkdir -p /usr/lib/sddm/sddm.conf.d/
-cp /ctx/sddm-custom.conf /usr/lib/sddm/sddm.conf.d/sddm-custom.conf
+# Plasma Login Manager Migration & Setup
+cp /ctx/a.os-plasmalogin-migration.sh /usr/libexec/a.os-plasmalogin-migration.sh
+chmod +x /usr/libexec/a.os-plasmalogin-migration.sh
+ln -sfn /usr/libexec/a.os-plasmalogin-migration.sh /usr/bin/aos-migrate-login-manager
+cp /ctx/a.os-plasmalogin-migration.service /usr/lib/systemd/system/a.os-plasmalogin-migration.service
 
 # Wallpapers
 cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
@@ -230,7 +232,8 @@ systemctl enable podman.socket
 systemctl enable cockpit.socket
 systemctl enable tailscaled.service
 systemctl set-default graphical.target
-systemctl enable sddm.service
+systemctl enable plasmalogin.service
+systemctl enable a.os-plasmalogin-migration.service
 systemctl enable a.os-flatpak-preinstall.service
 systemctl enable firewalld.service
 systemctl enable brew-setup.service

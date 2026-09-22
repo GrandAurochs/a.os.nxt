@@ -123,6 +123,11 @@ read -p "Press [Enter] to begin the A.OS download and installation..."
 
 bootc switch $TARGET_IMAGE
 
+# Ensure display manager is migrated from SDDM to Plasma Login Manager
+echo -e "\n${YELLOW}Configuring Plasma Login Manager...${NC}"
+systemctl disable sddm.service 2>/dev/null || true
+systemctl enable --force plasmalogin.service 2>/dev/null || true
+
 echo -e "\n${GREEN}==========================================${NC}"
 echo -e "${GREEN}🎉 Migration Complete! 🎉${NC}"
 echo -e "${GREEN}==========================================${NC}"

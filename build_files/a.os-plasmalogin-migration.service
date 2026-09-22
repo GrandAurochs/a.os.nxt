@@ -1,0 +1,13 @@
+[Unit]
+Description=A.OS Plasma Login Manager Migration
+ConditionFileIsExecutable=/usr/libexec/a.os-plasmalogin-migration.sh
+Before=display-manager.service plasmalogin.service
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/a.os-plasmalogin-migration.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target
