@@ -148,6 +148,69 @@ default=kde
 org.freedesktop.impl.portal.Settings=kde;gtk;
 EOF
 
+# User Setup & Migration (Ensures existing and new user sessions use 3-button window controls & Flatpak overrides)
+mkdir -p /etc/skel/.config/gtk-3.0 /etc/skel/.config/gtk-4.0
+cp /etc/gtk-3.0/settings.ini /etc/skel/.config/gtk-3.0/settings.ini
+cp /etc/gtk-4.0/settings.ini /etc/skel/.config/gtk-4.0/settings.ini
+
+cat << 'EOF' > /usr/libexec/a.os-user-setup.sh
+#!/bin/bash
+# A.OS user environment setup on graphical session start
+
+# 1. Update GSettings / dconf if unset or set to close-only
+if command -v gsettings >/dev/null 2>&1; then
+    CURRENT_LAYOUT="$(gsettings get org.gnome.desktop.wm.preferences button-layout 2>/dev/null || true)"
+    if [ "$CURRENT_LAYOUT" = "':close'" ] || [ "$CURRENT_LAYOUT" = "'appmenu:close'" ] || [ "$CURRENT_LAYOUT" = "''" ] || [ -z "$CURRENT_LAYOUT" ]; then
+        gsettings set org.gnome.desktop.wm.preferences button-layout ":minimize,maximize,close" 2>/dev/null || true
+    fi
+fi
+
+# 2. Ensure user GTK 3 & 4 settings.ini have gtk-decoration-layout
+for v in 3.0 4.0; do
+    dir="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-$v"
+    ini="$dir/settings.ini"
+    mkdir -p "$dir"
+    if [ ! -f "$ini" ]; then
+        cat << 'SETTINGSEOF' > "$ini"
+[Settings]
+gtk-decoration-layout=:minimize,maximize,close
+SETTINGSEOF
+    elif grep -qE '^gtk-decoration-layout\s*=\s*(:close|appmenu:close|icon:close)' "$ini"; then
+        sed -i 's/^gtk-decoration-layout\s*=.*/gtk-decoration-layout=:minimize,maximize,close/' "$ini"
+    elif ! grep -q '^gtk-decoration-layout' "$ini"; then
+        if grep -q '^\[Settings\]' "$ini"; then
+            sed -i '/^\[Settings\]/a gtk-decoration-layout=:minimize,maximize,close' "$ini"
+        else
+            printf "\n[Settings]\ngtk-decoration-layout=:minimize,maximize,close\n" >> "$ini"
+        fi
+    fi
+done
+
+# 3. Ensure Flatpaks can access host GTK settings
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak override --user --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/gtk-4.0:ro 2>/dev/null || true
+fi
+EOF
+chmod +x /usr/libexec/a.os-user-setup.sh
+
+mkdir -p /etc/xdg/autostart
+cat << 'EOF' > /etc/xdg/autostart/a.os-user-setup.desktop
+[Desktop Entry]
+Type=Application
+Name=A.OS User Setup
+Exec=/usr/libexec/a.os-user-setup.sh
+NoDisplay=true
+X-KDE-autostart-phase=1
+EOF
+
+mkdir -p /etc/profile.d
+cat << 'EOF' > /etc/profile.d/a.os-user-setup.sh
+if [ -n "$XDG_CURRENT_DESKTOP" ] && [ -x /usr/libexec/a.os-user-setup.sh ]; then
+    /usr/libexec/a.os-user-setup.sh >/dev/null 2>&1 &
+fi
+EOF
+chmod +x /etc/profile.d/a.os-user-setup.sh
+
 # Tailscale Multi-User Operator Configuration
 mkdir -p /usr/lib/systemd/system/user@.service.d/
 mkdir -p /etc/sudoers.d/

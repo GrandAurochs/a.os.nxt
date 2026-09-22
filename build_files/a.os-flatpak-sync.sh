@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+# Ensure system-wide Flatpak overrides allow read access to host GTK decoration config
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak override --system --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/gtk-4.0:ro 2>/dev/null || true
+fi
+
 MANIFEST="/usr/share/flatpak/preinstall.d/apps.preinstall"
 STATE_FILE="/var/lib/a.os-preinstall.hash"
 DISABLE_FLAG="/var/lib/a.os-sync-disabled"
