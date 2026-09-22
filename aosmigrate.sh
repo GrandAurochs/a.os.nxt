@@ -113,7 +113,7 @@ while true; do
     esac
 done
 
-echo -e "${YELLOW}--- Step 5: The Secure Rebase ---${NC}"
+echo -e "${YELLOW}--- Step 5: The Rebase ---${NC}"
 echo "Your system is prepped, secured, and ready."
 echo "We will now use the modern 'bootc' engine to pull down your selected OS layer."
 echo "This will download the image in the background, verify the cryptographic signature,"
