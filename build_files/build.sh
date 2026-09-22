@@ -15,6 +15,9 @@ dnf5 install -y \
     plasma-desktop \
     sddm \
     plasma-workspace-wayland \
+    kde-gtk-config \
+    xdg-desktop-portal-kde \
+    xdg-desktop-portal-gtk \
     sddm-kcm \
     kdeplasma-addons \
     konsole \
@@ -119,6 +122,31 @@ ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/
 # OS Release
 cp -f /ctx/os-release /usr/lib/os-release
 ln -sfn /usr/lib/os-release /etc/os-release
+
+# GTK / Flatpak Window Decoration Layout & Portals
+mkdir -p /usr/share/glib-2.0/schemas/
+cat << 'EOF' > /usr/share/glib-2.0/schemas/99-a-os-button-layout.gschema.override
+[org.gnome.desktop.wm.preferences]
+button-layout=':minimize,maximize,close'
+EOF
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+mkdir -p /etc/gtk-3.0 /etc/gtk-4.0
+cat << 'EOF' > /etc/gtk-3.0/settings.ini
+[Settings]
+gtk-decoration-layout=:minimize,maximize,close
+EOF
+cat << 'EOF' > /etc/gtk-4.0/settings.ini
+[Settings]
+gtk-decoration-layout=:minimize,maximize,close
+EOF
+
+mkdir -p /usr/share/xdg-desktop-portal
+cat << 'EOF' > /usr/share/xdg-desktop-portal/kde-portals.conf
+[preferred]
+default=kde
+org.freedesktop.impl.portal.Settings=kde;gtk;
+EOF
 
 # Tailscale Multi-User Operator Configuration
 mkdir -p /usr/lib/systemd/system/user@.service.d/
