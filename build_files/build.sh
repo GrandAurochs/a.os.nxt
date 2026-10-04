@@ -205,13 +205,6 @@ NoDisplay=true
 X-KDE-autostart-phase=1
 EOF
 
-mkdir -p /etc/profile.d
-cat << 'EOF' > /etc/profile.d/a.os-user-setup.sh
-if [ -n "$XDG_CURRENT_DESKTOP" ] && [ -x /usr/libexec/a.os-user-setup.sh ]; then
-    /usr/libexec/a.os-user-setup.sh >/dev/null 2>&1 &
-fi
-EOF
-chmod +x /etc/profile.d/a.os-user-setup.sh
 
 # Tailscale Multi-User Operator Configuration
 mkdir -p /usr/lib/systemd/system/user@.service.d/
