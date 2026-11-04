@@ -19,15 +19,13 @@ on:
     branches:
       - main
     paths:
-      - "./disk_config/disk.toml"
-      - "./disk_config/iso-kde.toml"
+      - "./installer/**"
       - "./.github/workflows/build-disk.yml"
 
 env:
   IMAGE_NAME: ${{ github.event.repository.name }}-main # output of build.yml, keep in sync
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
   DEFAULT_TAG: "latest"
-  BIB_IMAGE: "quay.io/centos-bootc/bootc-image-builder:latest"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
@@ -78,23 +76,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Build disk images
+      - name: Build Live Installer Image
+        run: |
+          podman build \
+            --cap-add sys_admin \
+            --security-opt label=disable \
+            --build-arg BASE_IMAGE="${{ env.TARGET_BUILD_IMAGE }}" \
+            -t a.os.nxt-installer:latest \
+            -f installer/Containerfile.iso \
+            .
+
+      - name: Build ISO with Titanoboa
         id: build
-        uses: osbuild/bootc-image-builder-action@main
+        uses: ublue-os/titanoboa@main
         with:
-          builder-image: ${{ env.BIB_IMAGE }}
-          config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso-kde.toml' || './disk_config/disk.toml' }}
-          image: ${{ env.TARGET_BUILD_IMAGE }}
-          chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
-          types: ${{ matrix.disk-type }}
-          additional-args: --use-librepo=True
-          rootfs: btrfs
+          image-ref: a.os.nxt-installer:latest
+
+      - name: Prepare ISO Output
+        id: prepare-output
+        run: |
+          mkdir -p output/bootiso
+          mv "${{ steps.build.outputs.iso-dest }}" output/bootiso/aOS-Live-KDE.iso
+          cd output/bootiso
+          sha256sum aOS-Live-KDE.iso > aOS-Live-KDE.iso-CHECKSUM
+          echo "output-directory=${{ github.workspace }}/output/bootiso" >> $GITHUB_OUTPUT
 
       - name: Upload disk images and Checksum to Job Artifacts
         if: inputs.upload-to-s3 != true && github.event_name != 'pull_request'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          path: ${{ steps.build.outputs.output-directory }}
+          path: ${{ steps.prepare-output.outputs.output-directory }}
           if-no-files-found: error
           retention-days: 0
           compression-level: 0
@@ -110,7 +121,7 @@ jobs:
           RCLONE_CONFIG_S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           RCLONE_CONFIG_S3_REGION: ${{ secrets.S3_REGION }}
           RCLONE_CONFIG_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
-          SOURCE_DIR: ${{ steps.build.outputs.output-directory }}
+          SOURCE_DIR: ${{ steps.prepare-output.outputs.output-directory }}
         run: |
           sudo apt-get update
           sudo apt-get install -y rclone

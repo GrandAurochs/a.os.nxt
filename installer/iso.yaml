@@ -1,0 +1,11 @@
+label: "aOS-Live-KDE"
+grub2:
+  default: 0
+  timeout: 10
+  entries:
+    - name: "Start a.OS Live & Install"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=aOS-Live-KDE enforcing=0 rd.live.image"
+      initrd: "/images/pxeboot/initrd.img"
+    - name: "Start a.OS Live & Install (Basic Graphics / Safe Mode)"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=aOS-Live-KDE enforcing=0 rd.live.image nomodeset"
+      initrd: "/images/pxeboot/initrd.img"

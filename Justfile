@@ -58,10 +58,10 @@ sudoif command *args:
     function sudoif(){
         if [[ "${UID}" -eq 0 ]]; then
             "$@"
+        elif [[ "$(command -v sudo)" && ( -n "${SUDO_ASKPASS:-}" || -n "${SSH_ASKPASS:-}" ) ]]; then
+            /usr/bin/sudo -A "$@" || exit 1
         elif [[ -t 0 ]] && [[ "$(command -v sudo)" ]]; then
             /usr/bin/sudo "$@" || exit 1
-        elif [[ "$(command -v sudo)" && ( -n "${SUDO_ASKPASS:-}" || -n "${SSH_ASKPASS:-}" ) ]] && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
-            /usr/bin/sudo --askpass "$@" || exit 1
         elif [[ "$(command -v sudo)" ]]; then
             /usr/bin/sudo "$@" || exit 1
         else
@@ -226,7 +226,54 @@ build-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_build
 
 # Build an ISO virtual machine image
 [group('Build Virtal Machine Image')]
-build-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_build-bib target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
+build-iso-container $target_image=("localhost/" + image_name) $tag=default_tag:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    target_image="${target_image,,}"
+    echo "Building Live Installer container for ${target_image}:${tag}..."
+    podman build \
+        --cap-add sys_admin \
+        --security-opt label=disable \
+        --build-arg BASE_IMAGE="${target_image}:${tag}" \
+        -t "${target_image}-installer:${tag}" \
+        -f installer/Containerfile.iso \
+        .
+
+# Build an ISO virtual machine image using Titanoboa
+[group('Build Virtal Machine Image')]
+build-iso $target_image=("localhost/" + image_name) $tag=default_tag:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    target_image="${target_image,,}"
+    installer_image="${target_image}-installer:${tag}"
+
+    if ! podman image exists "${installer_image}"; then
+        just build-iso-container "${target_image}" "${tag}"
+    fi
+
+    just _rootful_load_image "${target_image}-installer" "${tag}"
+
+    mkdir -p output/bootiso
+    BUILDTMP=$(mktemp -p "${PWD}" -d -t _build-titanoboa.XXXXXXXXXX)
+
+    echo "Running Titanoboa ISO generation..."
+    just sudoif podman run --rm -i \
+        --privileged \
+        --security-opt label=disable \
+        -v "${PWD}/installer/titanoboa/build_iso.sh:/src/build_iso.sh:ro" \
+        --mount type=image,source="${installer_image}",dst=/rootfs \
+        -v "${BUILDTMP}:/output" \
+        quay.io/fedora/fedora:latest /src/build_iso.sh
+
+    just sudoif mv -f "${BUILDTMP}"/*.iso output/bootiso/
+    just sudoif rmdir "${BUILDTMP}"
+    just sudoif chown -R $USER:$USER output/bootiso
+
+    latest_iso=$(ls -t output/bootiso/*.iso | grep -v 'install\.iso' | head -n 1)
+    if [[ -n "${latest_iso}" ]]; then
+        ln -sfn "$(basename "${latest_iso}")" output/bootiso/install.iso
+    fi
+    echo "ISO build complete: output/bootiso/install.iso"
 
 # Rebuild a QCOW2 virtual machine image
 [group('Build Virtal Machine Image')]
@@ -238,7 +285,9 @@ rebuild-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_reb
 
 # Rebuild an ISO virtual machine image
 [group('Build Virtal Machine Image')]
-rebuild-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_rebuild-bib target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
+rebuild-iso $target_image=("localhost/" + image_name) $tag=default_tag: (build target_image tag)
+    just build-iso-container "{{ target_image }}" "{{ tag }}"
+    just build-iso "{{ target_image }}" "{{ tag }}"
 
 # Run a virtual machine with the specified image type and configuration
 _run-vm $target_image $tag $type $config:
@@ -292,7 +341,7 @@ run-vm-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-
 
 # Run a virtual machine from an ISO
 [group('Run Virtal Machine')]
-run-vm-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-vm target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
+run-vm-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-vm target_image tag "iso" "")
 
 # Run a virtual machine using systemd-vmspawn
 [group('Run Virtal Machine')]

@@ -1,0 +1,5 @@
+ARG BASE_IMAGE="localhost/a.os.nxt-main:latest"
+FROM ${BASE_IMAGE}
+
+COPY installer /tmp/installer
+RUN /tmp/installer/build-iso-image.sh && rm -rf /tmp/installer
