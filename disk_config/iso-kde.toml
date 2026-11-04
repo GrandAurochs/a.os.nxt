@@ -1,6 +1,16 @@
 [customizations.installer.kickstart]
 contents = """
 %post
+# Configure A.OS signing policy
+mkdir -p /etc/pki/containers /etc/containers/registries.d
+curl -sSL -o /etc/pki/containers/a.os-cosign.pub https://raw.githubusercontent.com/GrandAurochs/a.os.nxt/main/cosign.pub 2>/dev/null || true
+cat << 'POLICY_EOF' > /etc/containers/registries.d/a.os.yaml
+docker:
+  ghcr.io/grandaurochs:
+    use-sigstore-attachments: true
+POLICY_EOF
+
+# Set bootc deployment target to A.OS
 bootc switch --mutate-in-place --transport registry ghcr.io/grandaurochs/a.os.nxt-main:latest
 %end
 """

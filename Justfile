@@ -1,4 +1,4 @@
-export image_name := env("IMAGE_NAME", "a.OS") # output image name, usually same as repo name, change as needed
+export image_name := lowercase(env("IMAGE_NAME", "a.os.nxt-main")) # output image name, usually same as repo name, change as needed
 export default_tag := env("DEFAULT_TAG", "latest")
 export bib_image := env("BIB_IMAGE", "quay.io/centos-bootc/bootc-image-builder:latest")
 
@@ -58,7 +58,9 @@ sudoif command *args:
     function sudoif(){
         if [[ "${UID}" -eq 0 ]]; then
             "$@"
-        elif [[ "$(command -v sudo)" && -n "${SSH_ASKPASS:-}" ]] && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+        elif [[ -t 0 ]] && [[ "$(command -v sudo)" ]]; then
+            /usr/bin/sudo "$@" || exit 1
+        elif [[ "$(command -v sudo)" && ( -n "${SUDO_ASKPASS:-}" || -n "${SSH_ASKPASS:-}" ) ]] && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
             /usr/bin/sudo --askpass "$@" || exit 1
         elif [[ "$(command -v sudo)" ]]; then
             /usr/bin/sudo "$@" || exit 1
@@ -89,6 +91,7 @@ sudoif command *args:
 build $target_image=image_name $tag=default_tag:
     #!/usr/bin/env bash
 
+    target_image="${target_image,,}"
     BUILD_ARGS=()
     if [[ -z "$(git status -s)" ]]; then
         BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=$(git rev-parse --short HEAD)")
@@ -121,6 +124,8 @@ _rootful_load_image $target_image=image_name $tag=default_tag:
     #!/usr/bin/bash
     set -eoux pipefail
 
+    target_image="${target_image,,}"
+
     # Check if already running as root or under sudo
     if [[ -n "${SUDO_USER:-}" || "${UID}" -eq "0" ]]; then
         echo "Already root or running under sudo, no need to load image from user podman."
@@ -145,6 +150,11 @@ _rootful_load_image $target_image=image_name $tag=default_tag:
             rm -rf "${COPYTMP}"
         fi
     else
+        if [[ "${target_image}" =~ ^localhost/ ]]; then
+            echo "Error: Local image ${target_image}:${tag} not found."
+            echo "Run 'just build' (or 'just rebuild-iso') to compile it locally first."
+            exit 1
+        fi
         # If the image is not found, pull it from the repository
         just sudoif podman pull "${target_image}:${tag}"
     fi
@@ -162,15 +172,24 @@ _build-bib $target_image $tag $type $config: (_rootful_load_image target_image t
     #!/usr/bin/env bash
     set -euo pipefail
 
+    target_image="${target_image,,}"
+
     args="--type ${type} "
     args+="--use-librepo=True "
     args+="--rootfs=btrfs"
 
     BUILDTMP=$(mktemp -p "${PWD}" -d -t _build-bib.XXXXXXXXXX)
 
+    DOCKER_FLAGS=()
+    if [ -t 0 ] && [ -t 1 ]; then
+        DOCKER_FLAGS+=("-it")
+    else
+        DOCKER_FLAGS+=("-i")
+    fi
+
     sudo podman run \
       --rm \
-      -it \
+      "${DOCKER_FLAGS[@]}" \
       --privileged \
       --pull=newer \
       --net=host \
@@ -207,7 +226,7 @@ build-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_build
 
 # Build an ISO virtual machine image
 [group('Build Virtal Machine Image')]
-build-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_build-bib target_image tag "iso" "disk_config/iso.toml")
+build-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_build-bib target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
 
 # Rebuild a QCOW2 virtual machine image
 [group('Build Virtal Machine Image')]
@@ -219,7 +238,7 @@ rebuild-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_reb
 
 # Rebuild an ISO virtual machine image
 [group('Build Virtal Machine Image')]
-rebuild-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_rebuild-bib target_image tag "iso" "disk_config/iso.toml")
+rebuild-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_rebuild-bib target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
 
 # Run a virtual machine with the specified image type and configuration
 _run-vm $target_image $tag $type $config:
@@ -228,7 +247,7 @@ _run-vm $target_image $tag $type $config:
 
     # Determine the image file based on the type
     image_file="output/${type}/disk.${type}"
-    if [[ $type == iso ]]; then
+    if [[ $type == iso || $type == anaconda-iso ]]; then
         image_file="output/bootiso/install.iso"
     fi
 
@@ -273,7 +292,7 @@ run-vm-raw $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-
 
 # Run a virtual machine from an ISO
 [group('Run Virtal Machine')]
-run-vm-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-vm target_image tag "iso" "disk_config/iso.toml")
+run-vm-iso $target_image=("localhost/" + image_name) $tag=default_tag: && (_run-vm target_image tag "anaconda-iso" "disk_config/iso-kde.toml")
 
 # Run a virtual machine using systemd-vmspawn
 [group('Run Virtal Machine')]
@@ -292,7 +311,6 @@ spawn-vm rebuild="0" type="qcow2" ram="6G":
       --network-user-mode \
       --vsock=false --pass-ssh-key=false \
       -i ./output/**/*.{{ type }}
-
 
 # Runs shell check on all Bash scripts
 lint:

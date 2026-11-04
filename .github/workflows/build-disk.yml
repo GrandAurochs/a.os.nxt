@@ -59,6 +59,7 @@ jobs:
           echo "DISK_TYPE=${DISK_TYPE}" >> ${GITHUB_ENV}
           echo "USER_UID=${USER_UID}" >> ${GITHUB_ENV}
           echo "USER_GID=${USER_GID}" >> ${GITHUB_ENV}
+          echo "TARGET_BUILD_IMAGE=${IMAGE_REGISTRY,,}/${IMAGE_NAME,,}:${DEFAULT_TAG}" >> ${GITHUB_ENV}
 
       - name: Install dependencies
         if: inputs.platform == 'arm64'
@@ -83,7 +84,7 @@ jobs:
         with:
           builder-image: ${{ env.BIB_IMAGE }}
           config-file: ${{ matrix.disk-type == 'anaconda-iso' && './disk_config/iso-kde.toml' || './disk_config/disk.toml' }}
-          image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}
+          image: ${{ env.TARGET_BUILD_IMAGE }}
           chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
           types: ${{ matrix.disk-type }}
           additional-args: --use-librepo=True

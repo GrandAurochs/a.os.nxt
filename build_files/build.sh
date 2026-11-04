@@ -125,6 +125,14 @@ ln -s /usr/lib64/dbus-1/system-services/org.kde.kcm_firewall.service /usr/share/
 cp -f /ctx/os-release /usr/lib/os-release
 ln -sfn /usr/lib/os-release /etc/os-release
 
+# Ensure DNF variables (like $releasever) are explicitly pinned for image builders
+mkdir -p /etc/dnf/vars
+echo "44" > /etc/dnf/vars/releasever
+
+# Pin $releasever to 44 in repo files so external builders (e.g., bootc-image-builder on CentOS 10)
+# never evaluate $releasever as 10
+sed -i 's/\$releasever/44/g' /etc/yum.repos.d/*.repo
+
 # GTK / Flatpak Window Decoration Layout & Portals
 mkdir -p /usr/share/glib-2.0/schemas/
 cat << 'EOF' > /usr/share/glib-2.0/schemas/99-a-os-button-layout.gschema.override
