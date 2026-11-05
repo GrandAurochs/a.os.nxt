@@ -111,10 +111,10 @@ cp /ctx/a.os-plasmalogin-migration.service /usr/lib/systemd/system/a.os-plasmalo
 
 # Wallpapers
 cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
-rm -r /usr/share/wallpapers/Default
+rm -rf /usr/share/wallpapers/Default
 ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
-rm -r /usr/share/wallpapers/F44
-rm -r /usr/share/wallpapers/Fedora
+rm -rf /usr/share/wallpapers/F4*
+rm -rf /usr/share/wallpapers/Fedora
 
 # Polkit Fixes
 rm /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
@@ -127,11 +127,11 @@ ln -sfn /usr/lib/os-release /etc/os-release
 
 # Ensure DNF variables (like $releasever) are explicitly pinned for image builders
 mkdir -p /etc/dnf/vars
-echo "44" > /etc/dnf/vars/releasever
+echo "45" > /etc/dnf/vars/releasever
 
-# Pin $releasever to 44 in repo files so external builders (e.g., bootc-image-builder on CentOS 10)
-# never evaluate $releasever as 10
-sed -i 's/\$releasever/44/g' /etc/yum.repos.d/*.repo
+# Pin $releasever to 45 in repo files so external builders
+# never evaluate $releasever incorrectly
+sed -i 's/\$releasever/45/g' /etc/yum.repos.d/*.repo
 
 # GTK / Flatpak Window Decoration Layout & Portals
 mkdir -p /usr/share/glib-2.0/schemas/

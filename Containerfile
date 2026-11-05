@@ -1,5 +1,5 @@
 # Base Image
-ARG BASE_IMAGE="ghcr.io/ublue-os/base-main:latest"
+ARG BASE_IMAGE="ghcr.io/ublue-os/base-main:45"
 
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
