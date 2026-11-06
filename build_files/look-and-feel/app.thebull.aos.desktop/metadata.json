@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "henrick@thebull.app",
+                "Name": "Henrick Stafford"
+            }
+        ],
+        "Category": "",
+        "Description": "Breeze-based default theme for a.OS",
+        "Id": "app.thebull.aos.desktop",
+        "License": "GPLv2+",
+        "Name": "a.OS",
+        "Website": "https://github.com/GrandAurochs/a.os.nxt"
+    },
+    "X-Plasma-APIVersion": "2"
+}

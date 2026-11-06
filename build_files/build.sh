@@ -110,11 +110,46 @@ ln -sfn /usr/libexec/a.os-plasmalogin-migration.sh /usr/bin/aos-migrate-login-ma
 cp /ctx/a.os-plasmalogin-migration.service /usr/lib/systemd/system/a.os-plasmalogin-migration.service
 
 # Wallpapers
+mkdir -p /usr/share/wallpapers
 cp -r /ctx/common/Fontainebleau /usr/share/wallpapers/Fontainebleau
+rm -rf /usr/share/wallpapers/Fontainebleau/contents/images_dark
 rm -rf /usr/share/wallpapers/Default
-ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
-rm -rf /usr/share/wallpapers/F4*
 rm -rf /usr/share/wallpapers/Fedora
+rm -rf /usr/share/wallpapers/Next
+rm -rf /usr/share/wallpapers/F4*
+ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Default
+ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Fedora
+ln -sfn /usr/share/wallpapers/Fontainebleau /usr/share/wallpapers/Next
+
+mkdir -p /usr/share/backgrounds
+ln -sfn /usr/share/wallpapers/Fontainebleau/contents/images/3080x4072.jpg /usr/share/backgrounds/default.jxl
+ln -sfn /usr/share/wallpapers/Fontainebleau/contents/images/3080x4072.jpg /usr/share/backgrounds/default-dark.jxl
+
+# Global Theme (Look and Feel)
+mkdir -p /usr/share/plasma/look-and-feel
+cp -r /ctx/look-and-feel/app.thebull.aos.desktop /usr/share/plasma/look-and-feel/app.thebull.aos.desktop
+ln -sfn app.thebull.aos.desktop /usr/share/plasma/look-and-feel/a.os.desktop
+ln -sfn app.thebull.aos.desktop /usr/share/plasma/look-and-feel/org.grandaurochs.aos.desktop
+
+# Set default Look and Feel package for KDE Plasma
+mkdir -p /etc/xdg
+if [ -f /etc/xdg/kdeglobals ]; then
+    if grep -q "LookAndFeelPackage=" /etc/xdg/kdeglobals; then
+        sed -i 's/^LookAndFeelPackage=.*/LookAndFeelPackage=app.thebull.aos.desktop/' /etc/xdg/kdeglobals
+    elif grep -q "^\[KDE\]" /etc/xdg/kdeglobals; then
+        sed -i '/^\[KDE\]/a LookAndFeelPackage=app.thebull.aos.desktop' /etc/xdg/kdeglobals
+    else
+        printf "\n[KDE]\nLookAndFeelPackage=app.thebull.aos.desktop\n" >> /etc/xdg/kdeglobals
+    fi
+else
+    cat << 'EOF' > /etc/xdg/kdeglobals
+[KDE]
+LookAndFeelPackage=app.thebull.aos.desktop
+EOF
+fi
+
+mkdir -p /etc/skel/.config
+cp -f /etc/xdg/kdeglobals /etc/skel/.config/kdeglobals
 
 # Polkit Fixes
 rm /usr/share/polkit-1/actions/org.fedoraproject.FirewallD1.policy
@@ -199,6 +234,14 @@ done
 # 3. Ensure Flatpaks can access host GTK settings
 if command -v flatpak >/dev/null 2>&1; then
     flatpak override --user --filesystem=xdg-config/gtk-3.0:ro --filesystem=xdg-config/gtk-4.0:ro 2>/dev/null || true
+fi
+
+# 4. Set LookAndFeelPackage if unset or set to upstream Fedora/Aurora default
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+    KDE_GLOBAL="${XDG_CONFIG_HOME:-$HOME/.config}/kdeglobals"
+    if [ ! -f "$KDE_GLOBAL" ] || ! grep -q '^LookAndFeelPackage=' "$KDE_GLOBAL" || grep -qE '^LookAndFeelPackage=(org\.fedoraproject\.fedora\.desktop|dev\.getaurora\.aurora\.desktop)' "$KDE_GLOBAL"; then
+        kwriteconfig6 --file "$KDE_GLOBAL" --group KDE --key LookAndFeelPackage app.thebull.aos.desktop 2>/dev/null || true
+    fi
 fi
 EOF
 chmod +x /usr/libexec/a.os-user-setup.sh
