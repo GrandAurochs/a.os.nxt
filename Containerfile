@@ -28,7 +28,7 @@ ENV SYSTEM_BASE=${BASE_IMAGE}
 ## Uncomment the following line if one desires to make /opt immutable and be able to be used
 ## by the package manager.
 
-RUN rm /opt && mkdir /opt
+# RUN rm /opt && mkdir /opt
 
 ### Homebrew Injection
 COPY --from=ghcr.io/ublue-os/brew:latest /system_files /

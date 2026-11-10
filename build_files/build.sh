@@ -76,9 +76,19 @@ dnf5 install -y codium
 dnf5 reinstall -y firewalld
 
 # Helium Browser
+# Temporarily replace /opt symlink with directory for RPM cpio extraction
+ORIGINAL_OPT_TARGET="$(readlink /opt || echo "var/opt")"
+rm -rf /opt && mkdir -p /opt
+
 dnf5 -y copr enable imput/helium
 dnf5 install -y helium-bin
 dnf5 -y copr disable imput/helium
+
+# Relocate Helium out of /opt into /usr/lib64 and restore original /opt symlink
+mv /opt/helium /usr/lib64/helium
+ln -sfn /usr/lib64/helium/helium-wrapper /usr/bin/helium
+rm -rf /opt
+ln -s "$ORIGINAL_OPT_TARGET" /opt
 
 
 # OhMyZsh
