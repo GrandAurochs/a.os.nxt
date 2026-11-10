@@ -90,6 +90,11 @@ ln -sfn /usr/lib64/helium/helium-wrapper /usr/bin/helium
 rm -rf /opt
 ln -s "$ORIGINAL_OPT_TARGET" /opt
 
+# Waterfox Browser
+dnf5 -y copr enable deltacopy/waterfox
+dnf5 install -y waterfox
+dnf5 -y copr disable deltacopy/waterfox
+
 
 # OhMyZsh
 bash /ctx/omzsh.sh
