@@ -75,12 +75,10 @@ dnf5 install -y codium
 
 dnf5 reinstall -y firewalld
 
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
+# Helium Browser
+dnf5 -y copr enable imput/helium
+dnf5 install -y helium-bin
+dnf5 -y copr disable imput/helium
 
 
 # OhMyZsh
