@@ -45,7 +45,17 @@ dnf5 install -y \
     cockpit \
     cockpit-ws \
     cockpit-podman \
-    cockpit-storaged
+    cockpit-storaged \
+    kde-connect \
+    fprintd \
+    fprintd-pam \
+    pam-u2f \
+    pamu2fcfg \
+    pcsc-lite \
+    pcsc-lite-ccid \
+    opensc \
+    pkcs11-provider \
+    sssd
 
 dnf5 group install -y development-tools
     
@@ -74,6 +84,7 @@ rpmkeys --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master
 dnf5 install -y codium
 
 dnf5 reinstall -y firewalld
+firewall-offline-cmd --add-service=kdeconnect || true
 
 # Helium Browser
 # Temporarily replace /opt symlink with directory for RPM cpio extraction
@@ -283,8 +294,12 @@ chmod 0440 /etc/sudoers.d/tailscale-operator
 cp /ctx/tailscale-operator.sh /etc/profile.d/tailscale-operator.sh
 chmod +x /etc/profile.d/tailscale-operator.sh
 
+# PAM Biometrics & Smartcard Authentication
+authselect select sssd with-fingerprint with-smartcard with-pam-u2f with-silent-lastlog with-mdns4 --force
+
 # Enable services
 
+systemctl enable pcscd.socket
 systemctl enable podman.socket
 systemctl enable cockpit.socket
 systemctl enable tailscaled.service
