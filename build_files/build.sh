@@ -84,7 +84,9 @@ rpmkeys --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master
 dnf5 install -y codium
 
 dnf5 reinstall -y firewalld
-firewall-offline-cmd --add-service=kdeconnect || true
+for zone in home public; do
+    firewall-offline-cmd --zone="$zone" --add-service=kdeconnect || true
+done
 
 # Helium Browser
 # Temporarily replace /opt symlink with directory for RPM cpio extraction
