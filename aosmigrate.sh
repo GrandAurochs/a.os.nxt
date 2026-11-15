@@ -86,7 +86,7 @@ while IFS= read -r line; do
     if [ "$marker" = "*" ]; then
       booted_idx=$total_deployments
     fi
-    ((total_deployments++))
+    total_deployments=$((total_deployments + 1))
   fi
 done < <(ostree admin status)
 
@@ -157,7 +157,7 @@ echo -e "to be downloaded.\n"
 prompt_step "Press [Enter] to fetch the public key..."
 
 mkdir -p /etc/pki/containers
-curl -Lo /etc/pki/containers/a.os-cosign.pub https://raw.githubusercontent.com/GrandAurochs/a.os.nxt/main/cosign.pub
+curl -fLo /etc/pki/containers/a.os-cosign.pub https://raw.githubusercontent.com/GrandAurochs/a.os.nxt/main/cosign.pub
 echo -e "${GREEN}✓ A.OS public key installed to /etc/pki/containers/a.os-cosign.pub!${NC}\n"
 
 # Step 5: Configuring the Trust Policy
