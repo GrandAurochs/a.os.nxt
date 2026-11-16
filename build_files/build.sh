@@ -108,6 +108,12 @@ dnf5 -y copr enable deltacopy/waterfox
 dnf5 install -y waterfox
 dnf5 -y copr disable deltacopy/waterfox
 
+# RPM Fusion & Steam
+dnf5 install -y \
+    "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
+    "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+dnf5 install -y steam
+
 
 # OhMyZsh
 bash /ctx/omzsh.sh
