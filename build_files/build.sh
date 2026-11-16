@@ -114,12 +114,6 @@ dnf5 install -y \
     "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
 dnf5 install -y steam
 
-# Steam Session (Bazzite Gamescope Session)
-dnf5 -y copr enable bazzite-org/bazzite
-dnf5 install -y gamescope gamescope-session-plus gamescope-session-steam
-dnf5 -y copr disable bazzite-org/bazzite
-
-
 # OhMyZsh
 bash /ctx/omzsh.sh
 
